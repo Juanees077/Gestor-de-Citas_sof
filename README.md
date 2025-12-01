@@ -1,29 +1,37 @@
-1. Funcionalidades para el Cliente
+🗓️ Gestor de Citas
 
-Agendar citas según la disponibilidad.
+Este proyecto es un gestor de citas  Permite organizar de forma eficiente la agenda diaria, evitar conflictos de horario y brindar a los clientes un proceso sencillo para agendar sus servicios.
 
-Consultar horarios disponibles.
+✨ Funcionalidades para el Cliente
 
-Recibir confirmación del agendamiento.
+📅 Agendar citas según la disponibilidad.
 
-2. Funcionalidades para el Administrador (la profesional del salón)
+🕒 Consultar horarios disponibles antes de reservar.
 
-Ver todas las citas programadas.
+📩 Recibir confirmación de la cita agendada.
 
-Crear nuevas citas manualmente.
+🔐 Funcionalidades para el Administrador (Profesional del Salón)
 
-Editar citas existentes.
+👀 Ver todas las citas programadas en el sistema.
 
-Eliminar citas.
+➕ Crear citas manualmente.
 
-Configurar y administrar los horarios disponibles (agenda laboral).
+✏️ Editar citas existentes.
 
-3. Requisitos Adicionales
+❌ Eliminar citas según necesidad.
 
-Sistema simple y rápido de usar.
+🗂️ Configurar y administrar la disponibilidad, ajustando la agenda laboral.
 
-Notificación o recordatorio opcional para los clientes.
+🛠️ Requisitos Adicionales
 
-Vista de calendario para una mejor organización del tiempo.
+⚡ Interfaz simple, rápida e intuitiva.
 
-Evitar conflictos: una cita por franja horaria debido a que solo trabaja una profesional.
+🔔 Notificaciones o recordatorios opcionales para clientes.
+
+📆 Vista de calendario para facilitar la gestión del tiempo.
+
+🚫 Evitar conflictos de horario: solo se permite una cita por franja, ya que trabaja una sola profesional.
+
+🎯 Objetivo del Sistema
+
+Optimizar la gestión de citas del salón, permitiendo un control total sobre el tiempo de trabajo y brindando a los clientes una experiencia fluida y confiable al momento de agendar sus servicios.
