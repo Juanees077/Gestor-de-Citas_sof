@@ -91,9 +91,17 @@ export default function Footer({ config }: FooterProps) {
           <p className="text-xs text-gray-500">
             © {year} {businessName}. Todos los derechos reservados.
           </p>
-          <p className="text-xs text-gray-500 flex items-center gap-1">
-            Hecho con <Heart className="w-3 h-3 text-rose-500" /> para ti
-          </p>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+            >
+              Admin
+            </Link>
+            <p className="text-xs text-gray-500 flex items-center gap-1">
+              Hecho con <Heart className="w-3 h-3 text-rose-500" /> para ti
+            </p>
+          </div>
         </div>
       </div>
     </footer>
