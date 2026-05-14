@@ -96,7 +96,7 @@ export default async function HomePage() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden sm:flex">
           <div className="w-6 h-10 border-2 border-rose-300 rounded-full flex items-start justify-center p-1">
             <div className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-float" />
           </div>
