@@ -94,9 +94,9 @@ export default function Footer({ config }: FooterProps) {
           <div className="flex items-center gap-4">
             <Link
               href="/admin"
-              className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1 rounded-full transition-colors"
             >
-              Admin
+              Panel Admin
             </Link>
             <p className="text-xs text-gray-500 flex items-center gap-1">
               Hecho con <Heart className="w-3 h-3 text-rose-500" /> para ti
