@@ -41,13 +41,14 @@ export default function AnimatedSection({
 
   const delayClass = delay > 0 ? `anim-delay-${delay}` : "";
 
+  const Component = Tag as React.ElementType;
+
   return (
-    // @ts-expect-error dynamic tag
-    <Tag
+    <Component
       ref={ref}
       className={cn("animate-on-scroll", animClass, delayClass, visible && "is-visible", className)}
     >
       {children}
-    </Tag>
+    </Component>
   );
 }
