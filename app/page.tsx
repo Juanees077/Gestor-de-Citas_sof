@@ -48,14 +48,14 @@ export default async function HomePage() {
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-pink-200 rounded-full opacity-20 blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-100 rounded-full opacity-30 blur-3xl" />
 
-        <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto animate-fade-in">
+        <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto animate-fade-in pt-20 sm:pt-0">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-rose-100 rounded-full px-4 py-2 mb-6 shadow-soft">
             <Sparkles className="w-4 h-4 text-rose-500" />
             <span className="text-sm font-medium text-rose-700">AQUÍ empieza la magia</span>
           </div>
 
-          <h1 className="font-display text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-4">
             Hola, soy{" "}
             <span className="text-gradient">{businessName}</span>
           </h1>
