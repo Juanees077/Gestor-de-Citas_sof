@@ -20,6 +20,9 @@ import { supabase } from "@/lib/supabase";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import type { Config, Service } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getData() {
   const [configRes, servicesRes] = await Promise.all([
     supabase.from("config").select("*").single(),
