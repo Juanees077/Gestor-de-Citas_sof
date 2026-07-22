@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Sofia Martinez | Especialista en Belleza",
@@ -29,7 +30,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="min-h-screen bg-cream-100">{children}</body>
+      <body className="min-h-screen bg-cream-100">
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   );
 }

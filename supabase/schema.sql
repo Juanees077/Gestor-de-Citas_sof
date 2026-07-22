@@ -87,6 +87,39 @@ CREATE TABLE IF NOT EXISTS appointments (
 );
 
 -- =============================================
+-- TABLA: gallery (fotos de trabajos realizados)
+-- =============================================
+CREATE TABLE IF NOT EXISTS gallery (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  image_path TEXT NOT NULL, -- ruta dentro del bucket de storage
+  image_url TEXT NOT NULL, -- URL pública
+  caption TEXT DEFAULT '',
+  category TEXT DEFAULT '',
+  active BOOLEAN DEFAULT TRUE,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_active_order ON gallery(active, sort_order);
+
+-- =============================================
+-- STORAGE: bucket público para las fotos de la galería
+-- =============================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('gallery', 'gallery', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Nota: no se necesita política de SELECT para lectura pública: el bucket es
+-- público, así que las fotos se sirven por URL pública sin pasar por RLS.
+-- Una política de SELECT permitiría además *listar* todos los archivos, que
+-- es más acceso del necesario.
+CREATE POLICY "gallery_bucket_admin_insert" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'gallery' AND auth.role() = 'authenticated');
+
+CREATE POLICY "gallery_bucket_admin_delete" ON storage.objects
+  FOR DELETE USING (bucket_id = 'gallery' AND auth.role() = 'authenticated');
+
+-- =============================================
 -- ÍNDICES para performance
 -- =============================================
 CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments(appointment_date);
@@ -143,6 +176,7 @@ CREATE TRIGGER appointments_updated_at
 ALTER TABLE config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
 
 -- Config: solo lectura pública, escritura solo admin autenticado
 CREATE POLICY "config_public_read" ON config FOR SELECT USING (true);
@@ -159,3 +193,9 @@ CREATE POLICY "appointments_public_read" ON appointments FOR SELECT USING (true)
 CREATE POLICY "appointments_public_insert" ON appointments FOR INSERT WITH CHECK (true);
 CREATE POLICY "appointments_admin_update" ON appointments FOR UPDATE USING (true);
 CREATE POLICY "appointments_admin_delete" ON appointments FOR DELETE USING (auth.role() = 'authenticated');
+
+-- Gallery: lectura pública de fotos activas, escritura solo admin
+CREATE POLICY "gallery_public_read" ON gallery FOR SELECT USING (true);
+CREATE POLICY "gallery_admin_insert" ON gallery FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "gallery_admin_update" ON gallery FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "gallery_admin_delete" ON gallery FOR DELETE USING (auth.role() = 'authenticated');

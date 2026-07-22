@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   Save,
   PlusCircle,
@@ -12,17 +13,23 @@ import {
   Scissors,
   Globe,
   AlertCircle,
+  Images,
+  UploadCloud,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { cn, DAY_NAMES_FULL } from "@/lib/utils";
-import type { Config, Service } from "@/lib/types";
+import type { Config, Service, GalleryImage } from "@/lib/types";
 
-type Tab = "negocio" | "horarios" | "servicios";
+type Tab = "negocio" | "horarios" | "servicios" | "galeria";
 
 export default function ConfiguracionPage() {
   const [tab, setTab] = useState<Tab>("negocio");
   const [config, setConfig] = useState<Config | null>(null);
   const [services, setServices] = useState<Service[]>([]);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -38,12 +45,14 @@ export default function ConfiguracionPage() {
 
   useEffect(() => {
     async function load() {
-      const [confRes, servRes] = await Promise.all([
+      const [confRes, servRes, galleryRes] = await Promise.all([
         supabase.from("config").select("*").single(),
         supabase.from("services").select("*").order("sort_order"),
+        supabase.from("gallery").select("*").order("sort_order"),
       ]);
       setConfig(confRes.data);
       setServices(servRes.data || []);
+      setGallery(galleryRes.data || []);
       setLoading(false);
     }
     load();
@@ -105,10 +114,60 @@ export default function ConfiguracionPage() {
     setServices((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const handleGalleryUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadError("");
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith("image/")) {
+          setUploadError("Solo se permiten archivos de imagen.");
+          continue;
+        }
+        const ext = file.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("gallery").upload(path, file);
+        if (uploadErr) {
+          setUploadError(uploadErr.message);
+          continue;
+        }
+        const { data: publicUrlData } = supabase.storage.from("gallery").getPublicUrl(path);
+        const { data } = await supabase
+          .from("gallery")
+          .insert({
+            image_path: path,
+            image_url: publicUrlData.publicUrl,
+            sort_order: gallery.length,
+          })
+          .select()
+          .single();
+        if (data) setGallery((prev) => [...prev, data]);
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleGalleryDelete = async (img: GalleryImage) => {
+    await supabase.storage.from("gallery").remove([img.image_path]);
+    await supabase.from("gallery").delete().eq("id", img.id);
+    setGallery((prev) => prev.filter((g) => g.id !== img.id));
+  };
+
+  const setGalleryField = (id: string, field: "caption" | "category", value: string) => {
+    setGallery((prev) => prev.map((g) => (g.id === id ? { ...g, [field]: value } : g)));
+  };
+
+  const persistGalleryField = async (id: string, field: "caption" | "category", value: string) => {
+    await supabase.from("gallery").update({ [field]: value }).eq("id", id);
+  };
+
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "negocio", label: "Negocio", icon: <Building className="w-4 h-4" /> },
     { id: "horarios", label: "Horarios", icon: <Clock className="w-4 h-4" /> },
     { id: "servicios", label: "Servicios", icon: <Scissors className="w-4 h-4" /> },
+    { id: "galeria", label: "Galería", icon: <Images className="w-4 h-4" /> },
   ];
 
   if (loading) {
@@ -316,6 +375,87 @@ export default function ConfiguracionPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ===== TAB: GALERÍA ===== */}
+      {tab === "galeria" && (
+        <div>
+          <div className="mb-5">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleGalleryUpload(e.target.files)}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full border-2 border-dashed border-rose-200 rounded-2xl py-10 flex flex-col items-center gap-2 text-gray-500 hover:border-rose-400 hover:bg-rose-50/50 transition-all disabled:opacity-60"
+            >
+              {uploading ? (
+                <>
+                  <div className="w-6 h-6 border-2 border-rose-200 border-t-rose-500 rounded-full animate-spin" />
+                  <span className="text-sm">Subiendo...</span>
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="w-6 h-6 text-rose-400" />
+                  <span className="text-sm font-medium">Haz clic para subir fotos</span>
+                  <span className="text-xs text-gray-400">JPG, PNG o WEBP · puedes seleccionar varias</span>
+                </>
+              )}
+            </button>
+            {uploadError && (
+              <p className="text-sm text-red-600 flex items-center gap-1 mt-2">
+                <AlertCircle className="w-4 h-4" /> {uploadError}
+              </p>
+            )}
+          </div>
+
+          {gallery.length === 0 ? (
+            <p className="text-center text-gray-400 text-sm py-10">
+              Todavía no has subido fotos. Sube la primera arriba.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {gallery.map((img) => (
+                <div key={img.id} className="card p-3 flex gap-3">
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                    <Image src={img.image_url} alt={img.caption || "Foto de galería"} fill unoptimized className="object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <input
+                      type="text"
+                      aria-label="Descripción de la foto"
+                      placeholder="Descripción (opcional)"
+                      className="input-field py-1.5 text-sm"
+                      value={img.caption}
+                      onChange={(e) => setGalleryField(img.id, "caption", e.target.value)}
+                      onBlur={(e) => persistGalleryField(img.id, "caption", e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      aria-label="Categoría de la foto"
+                      placeholder="Categoría (ej: Color, Uñas)"
+                      className="input-field py-1.5 text-sm"
+                      value={img.category}
+                      onChange={(e) => setGalleryField(img.id, "category", e.target.value)}
+                      onBlur={(e) => persistGalleryField(img.id, "category", e.target.value)}
+                    />
+                  </div>
+                  <button
+                    onClick={() => handleGalleryDelete(img)}
+                    className="p-2 h-fit rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

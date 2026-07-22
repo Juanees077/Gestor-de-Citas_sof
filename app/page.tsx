@@ -16,26 +16,31 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
+import GalleryGrid from "@/components/GalleryGrid";
+import TiltCard from "@/components/TiltCard";
+import CountUp from "@/components/CountUp";
 import { supabase } from "@/lib/supabase";
 import { formatPrice, formatDuration } from "@/lib/utils";
-import type { Config, Service } from "@/lib/types";
+import type { Config, Service, GalleryImage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 async function getData() {
-  const [configRes, servicesRes] = await Promise.all([
+  const [configRes, servicesRes, galleryRes] = await Promise.all([
     supabase.from("config").select("*").single(),
     supabase.from("services").select("*").eq("active", true).order("sort_order"),
+    supabase.from("gallery").select("*").eq("active", true).order("sort_order"),
   ]);
   return {
     config: configRes.data as Config | null,
     services: (servicesRes.data as Service[]) || [],
+    gallery: (galleryRes.data as GalleryImage[]) || [],
   };
 }
 
 export default async function HomePage() {
-  const { config, services } = await getData();
+  const { config, services, gallery } = await getData();
 
   const businessName = config?.business_name || "Sofia Martinez";
   const tagline = config?.tagline || "Especialista en Belleza";
@@ -73,7 +78,7 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/reservar" className="btn-primary text-base px-8 py-4">
+            <Link href="/reservar" className="btn-primary btn-shine text-base px-8 py-4">
               <Calendar className="w-5 h-5" />
               Reservar mi cita
             </Link>
@@ -86,12 +91,12 @@ export default async function HomePage() {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 mt-14">
             {[
-              { value: "500+", label: "Clientes felices" },
-              { value: "5★", label: "Calificación" },
-              { value: "5+", label: "Años de experiencia" },
+              { end: 500, suffix: "+", label: "Clientes felices" },
+              { end: 5, suffix: "★", label: "Calificación" },
+              { end: 5, suffix: "+", label: "Años de experiencia" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-rose-600">{stat.value}</div>
+                <CountUp end={stat.end} suffix={stat.suffix} className="text-2xl font-bold text-rose-600" />
                 <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
               </div>
             ))}
@@ -124,7 +129,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {services.map((service, i) => (
                 <AnimatedSection key={service.id} animation="fade-up" delay={(i % 4 + 1) as 1|2|3|4}>
-                  <div className="card-hover group p-6 h-full">
+                  <TiltCard className="card-hover group p-6 h-full">
                   <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center mb-4 group-hover:bg-rose-100 transition-colors">
                     <Sparkles className="w-6 h-6 text-rose-500" />
                   </div>
@@ -145,7 +150,7 @@ export default async function HomePage() {
                       {formatDuration(service.duration)}
                     </span>
                   </div>
-                  </div>
+                  </TiltCard>
                 </AnimatedSection>
               ))}
             </div>
@@ -185,9 +190,9 @@ export default async function HomePage() {
                 desc: "Uso productos de alta calidad y técnicas actualizadas para garantizar los mejores resultados.",
               },
               {
-                icon: <CheckCircle className="w-8 h-8 text-green-500" />,
-                title: "Recordatorios automáticos",
-                desc: "Recibes un recordatorio por email antes de tu cita para que nunca la olvides.",
+                icon: <Heart className="w-8 h-8 text-green-500" />,
+                title: "Atención personalizada",
+                desc: "Cada servicio se adapta a ti: escucho lo que buscas y te asesoro para lograr el resultado ideal.",
               },
             ].map((item, i) => (
               <AnimatedSection key={item.title} animation="fade-up" delay={(i + 1) as 1|2|3}>
@@ -260,13 +265,13 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Clientes satisfechas</p>
-                  <p className="font-bold text-gray-900">500+</p>
+                  <CountUp end={500} suffix="+" className="font-bold text-gray-900" />
                 </div>
               </div>
               <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-soft p-4 flex items-center gap-2 animate-float" style={{ animationDelay: "1s" }}>
                 <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                 <div>
-                  <p className="font-bold text-gray-900">5.0</p>
+                  <CountUp end={5} decimals={1} className="font-bold text-gray-900" />
                   <p className="text-xs text-gray-500">Calificación</p>
                 </div>
               </div>
@@ -276,8 +281,26 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ===== GALERÍA ===== */}
+      <section id="galeria" className="py-20 bg-cream-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection animation="fade-up" className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-rose-50 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="w-4 h-4 text-rose-500" />
+              <span className="text-sm font-medium text-rose-700">Mi trabajo</span>
+            </div>
+            <h2 className="section-title mb-3">Galería de trabajos</h2>
+            <p className="section-subtitle">
+              Algunos de mis trabajos en uñas y maquillaje
+            </p>
+          </AnimatedSection>
+
+          <GalleryGrid images={gallery} />
+        </div>
+      </section>
+
       {/* ===== CTA ===== */}
-      <section className="py-20 bg-rose-gradient relative overflow-hidden">
+      <section className="py-20 bg-rose-gradient bg-gradient-animated relative overflow-hidden">
         <div className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: "radial-gradient(circle at 20% 50%, white 0%, transparent 50%), radial-gradient(circle at 80% 50%, white 0%, transparent 50%)",
@@ -292,7 +315,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/reservar"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-rose-600 font-bold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
+            className="btn-shine inline-flex items-center gap-2 px-8 py-4 bg-white text-rose-600 font-bold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
           >
             <Calendar className="w-5 h-5" />
             Reservar cita gratis

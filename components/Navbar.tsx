@@ -21,7 +21,8 @@ export default function Navbar() {
   const links = [
     { href: "/", label: "Inicio" },
     { href: "/#servicios", label: "Servicios" },
-    { href: "/#nosotras", label: "Nosotras" },
+    { href: "/#nosotras", label: "Sobre mí" },
+    { href: "/#galeria", label: "Galería" },
     { href: "/#contacto", label: "Contacto" },
   ];
 

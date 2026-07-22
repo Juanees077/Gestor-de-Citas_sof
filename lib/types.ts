@@ -47,6 +47,17 @@ export interface Appointment {
   service?: Service;
 }
 
+export interface GalleryImage {
+  id: string;
+  image_path: string;
+  image_url: string;
+  caption: string;
+  category: string;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface TimeSlot {
   start: string;
   end: string;
