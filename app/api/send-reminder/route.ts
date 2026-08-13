@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
-import { sendReminderEmail } from "@/lib/email";
+import { sendReminderWhatsApp } from "@/lib/whatsapp";
 import type { Appointment, Service, Config } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
@@ -29,11 +29,11 @@ export async function POST(req: NextRequest) {
     const appointment = apptRes.data as Appointment & { service: Service };
     const config = configRes.data as Config;
 
-    if (!appointment.client_email) {
-      return NextResponse.json({ success: false, error: "El cliente no tiene email" });
+    if (!appointment.client_phone) {
+      return NextResponse.json({ success: false, error: "El cliente no tiene teléfono" });
     }
 
-    const result = await sendReminderEmail({
+    const result = await sendReminderWhatsApp({
       appointment,
       service: appointment.service,
       config,

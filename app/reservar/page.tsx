@@ -53,7 +53,7 @@ export default function ReservarPage() {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
