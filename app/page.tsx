@@ -256,7 +256,7 @@ export default async function HomePage() {
               {/* Visual placeholder - elegant card */}
               <div className="relative">
               <div className="aspect-[3/4] max-w-sm mx-auto rounded-3xl shadow-rose-lg relative overflow-hidden">
-                <Image src="/modelo.png" alt={businessName} fill className="object-cover object-top" quality={100} />
+                <Image src="/hero.jpeg" alt={businessName} fill className="object-cover object-top" quality={100} />
               </div>
               {/* Floating badges */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-soft p-4 flex items-center gap-3 animate-float">
